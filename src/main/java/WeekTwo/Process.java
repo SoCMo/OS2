@@ -2,6 +2,7 @@ package WeekTwo;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -17,9 +18,11 @@ public class Process implements Runnable{
 
     private int id;
 
-    private int need;
+    private List<Integer> max;
 
-    private int consumption;
+    private List<Integer> consumption;
+
+    private Boolean isEnd;
 
     @Override
     public void run() {
@@ -27,9 +30,16 @@ public class Process implements Runnable{
     }
 
     Process(){
+        max = new ArrayList<>();
+        consumption = new ArrayList<>();
         Random random = new Random();
         this.id = ++index;
-        this.need = random.nextInt(Dispatch.getResources() + 1);
-        this.consumption = 0;
+        for(int i = 0; i < Dispatch.RESOURCE_TYPE; i++){
+            this.max.add(random.nextInt(Dispatch.resources.get(i)));
+            int min = Math.min(this.max.get(i), Dispatch.resources.get(i) / 2);
+            this.consumption.add(random.nextInt(Math.max(min, 1)));
+            Dispatch.resources.set(i, Dispatch.resources.get(i) - this.consumption.get(i));
+        }
+        this.isEnd = false;
     }
 }
