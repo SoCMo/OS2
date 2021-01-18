@@ -1,6 +1,8 @@
 package WeekFour;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
 * @program: OFUnit
@@ -9,6 +11,8 @@ import lombok.Data;
 * @Date: 2021/1/18
 */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class OFUnit {
     private Integer fileId;
 
