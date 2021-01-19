@@ -1,7 +1,7 @@
 package WeekFour;
 
+import java.sql.SQLOutput;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
 * @program: Main
@@ -16,7 +16,7 @@ public class Main {
                 Arrays.asList(
                         new MFDUnit("zhangsan",
                                 new UFD(
-                                        Arrays.asList(
+                                        new ArrayList<>(Arrays.asList(
                                                 new UFDUnit(
                                                         "zs_f1",
                                                         "111",
@@ -32,12 +32,12 @@ public class Main {
                                                         "111",
                                                         100
                                                 )
-                                        )
+                                        ))
                                 )
                         ),
                         new MFDUnit("lisi",
                                 new UFD(
-                                        Arrays.asList(
+                                        new ArrayList<>(Arrays.asList(
                                                 new UFDUnit(
                                                         "lisi_f1",
                                                         "101",
@@ -48,7 +48,7 @@ public class Main {
                                                         "000",
                                                         9
                                                 )
-                                        )
+                                        ))
                                 )
                         )
                 )
@@ -60,14 +60,17 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         String userIn = scanner.nextLine();
-        String finalUser = userIn;
-        while (mfd.getMfdUnitList().stream()
-                .noneMatch(mfdUnit -> mfdUnit.getUserName()
-                        .equals(finalUser.trim()))){
-            System.out.println("YOUR NAME IS NOT IN THE USER NAME TABLE,TRY AGAIN.");
-            userIn = scanner.nextLine();
+        while (true){
+            String finalUserTemp = userIn;
+            if(mfd.getMfdUnitList().stream()
+                    .noneMatch(mfdUnit -> mfdUnit.getUserName()
+                            .equals(finalUserTemp.trim()))){
+                System.out.println("YOUR NAME IS NOT IN THE USER NAME TABLE,TRY AGAIN.");
+                userIn = scanner.nextLine();
+            }else break;
         }
 
+        String finalUser = userIn;
         Optional<MFDUnit> mfdUnitTemp =
                 mfd.getMfdUnitList().stream()
                         .filter(mfdUnit -> mfdUnit.getUserName()
@@ -81,10 +84,12 @@ public class Main {
         MFDUnit mfdUnit = mfdUnitTemp.get();
         OFUnit[] ofUnits = new OFUnit[5];
 
+        show(mfdUnit);
+
         System.out.println("COMMAND NAME?");
         String command = scanner.nextLine();
         command = command.toUpperCase();
-        while(!command.equalsIgnoreCase("BYE")){
+        while(!command.equals("BYE")){
             switch (command){
                 case "CREATE": create(mfdUnit, ofUnits, scanner);
                                 break;
@@ -97,10 +102,28 @@ public class Main {
                 case "READ":   read(mfdUnit, ofUnits, scanner);
                                 break;
                 case "WRITE":  write(mfdUnit, ofUnits, scanner);
+                                break;
+                default:
+                    System.out.println("COMMAND NAME GIVEN IS WRONG!");
             }
 
             System.out.println("COMMAND NAME?");
             command = scanner.nextLine();
+            command = command.toUpperCase();
+        }
+    }
+
+    private static void show(MFDUnit mfdUnit) {
+        System.out.println("YOUR FILE DIRECTORY");
+        System.out.println("FILE NAME\t\tPROTECTION CODE\t\tLENGTH");
+        mfdUnit.getUfd().getUfdUnitList()
+                .forEach(ufdUnit -> System.out.println(
+                        ufdUnit.getFileName() + "\t\t\t" +
+                        ufdUnit.getProtectCode() + "\t\t\t\t\t" +
+                        ufdUnit.getFileLength()
+                ));
+        for(int i = 0; i < 10 - mfdUnit.getUfd().getUfdUnitList().size(); i++){
+            System.out.println("******\t\t\t000\t\t\t\t\t0");
         }
     }
 
@@ -123,6 +146,7 @@ public class Main {
 
         System.out.println("HOW MANY CHARACTERS TO BE WRITTEN INTO THAT FILE?");
         int input = scanner.nextInt();
+        scanner.nextLine();
         mfdUnit.getUfd().getUfdUnitList()
                 .stream()
                 .filter(ufdUnit -> ufdUnit.getId().equals(ofUnits[number].getFileId()))
@@ -134,6 +158,7 @@ public class Main {
     private static void read(MFDUnit mfdUnit, OFUnit[] ofUnits, Scanner scanner) {
         System.out.println("FILE OPEN NUMBER TO BE READ?");
         int number = scanner.nextInt();
+        scanner.nextLine();
         if (number > 5 || number <= 0 || ofUnits[number] == null){
             if(number > 5 || number <= 0 ){
                 System.out.println("ERROR NUMBER");
@@ -188,9 +213,11 @@ public class Main {
             return;
         }
 
-        if(Arrays.stream(ofUnits).anyMatch(ofUnit -> ofUnit.getFileId().equals(ufdUnit.getId()))){
-            System.out.println("ALREADY RUNNING!");
-            return;
+        for(OFUnit ofUnit: ofUnits){
+            if(ofUnit != null && ofUnit.getFileId().equals(ufdUnit.getId())){
+                System.out.println("ALREADY RUNNING!");
+                return;
+            }
         }
 
         System.out.println("ENTER THE OPEN MODE?");
@@ -210,6 +237,7 @@ public class Main {
 
         System.out.println("THIS FILE IS OPENED,ITS OPEN NUMBER IS");
         int number = scanner.nextInt();
+        scanner.nextLine();
         while (number > 5 || number <= 0 || ofUnits[number] != null){
             if(number > 5 || number <= 0 ){
                 System.out.println("ERROR NUMBER");
@@ -268,7 +296,7 @@ public class Main {
         }
 
         if(mfdUnit.getUfd().getUfdUnitList().stream()
-                .noneMatch(ufdUnit -> ufdUnit.getFileName()
+                .anyMatch(ufdUnit -> ufdUnit.getFileName()
                         .equals(name.trim()))){
             System.out.println("ALREADY EXISTS!");
             return;
@@ -292,8 +320,16 @@ public class Main {
             return;
         }
 
+        if(!openMode.matches("^" +
+                ufdUnit.getProtectCode()
+                        .replace("1", "."))){
+            System.out.println("REJECT CODE");
+            return;
+        }
+
         System.out.println("THIS FILE IS OPENED,ITS OPEN NUMBER IS");
         int number = scanner.nextInt();
+        scanner.nextLine();
         while(number > 5 || number <= 0 || ofUnits[number] != null){
             System.out.println("OPEN NUMBER ERROR!");
 
