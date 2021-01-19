@@ -1,6 +1,5 @@
 package WeekFour;
 
-import java.sql.SQLOutput;
 import java.util.*;
 
 /**
@@ -103,6 +102,8 @@ public class Main {
                                 break;
                 case "WRITE":  write(mfdUnit, ofUnits, scanner);
                                 break;
+                case "LS":     show(mfdUnit);
+                                break;
                 default:
                     System.out.println("COMMAND NAME GIVEN IS WRONG!");
             }
@@ -111,6 +112,8 @@ public class Main {
             command = scanner.nextLine();
             command = command.toUpperCase();
         }
+
+        show(mfdUnit);
     }
 
     private static void show(MFDUnit mfdUnit) {
@@ -130,6 +133,7 @@ public class Main {
     private static void write(MFDUnit mfdUnit, OFUnit[] ofUnits, Scanner scanner) {
         System.out.println("OPEN FILE NUMBER?");
         int number = scanner.nextInt();
+        scanner.nextLine();
         if (number > 5 || number <= 0 || ofUnits[number] == null){
             if(number > 5 || number <= 0 ){
                 System.out.println("ERROR NUMBER");
@@ -179,6 +183,7 @@ public class Main {
     private static void close(OFUnit[] ofUnits, Scanner scanner) {
         System.out.println("FILE OPEN NUMBER TO BE OPENED?");
         int number = scanner.nextInt();
+        scanner.nextLine();
         if (number > 5 || number <= 0 || ofUnits[number] == null){
             if(number > 5 || number <= 0 ){
                 System.out.println("ERROR NUMBER");
@@ -273,9 +278,11 @@ public class Main {
             return;
         }
 
-        if(Arrays.stream(ofUnits).anyMatch(ofUnit -> ofUnit.getFileId().equals(ufdUnit.getId()))){
-            System.out.println("ERROR MESSAGE:IT IS NOT ALLOWED TO DELETE RUNNING FILE!");
-            return;
+        for(OFUnit ofUnit: ofUnits){
+            if(ofUnit != null && ofUnit.getFileId().equals(ufdUnit.getId())){
+                System.out.println("ERROR MESSAGE:IT IS NOT ALLOWED TO DELETE RUNNING FILE!");
+                return;
+            }
         }
 
         mfdUnit.getUfd().getUfdUnitList().remove(ufdUnit);
