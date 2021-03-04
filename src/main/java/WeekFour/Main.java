@@ -251,6 +251,7 @@ public class Main {
             }
             System.out.println("TYPE AGAIN: ");
             number = scanner.nextInt();
+            scanner.nextLine();
         }
 
         ofUnits[number] = new OFUnit(ufdUnit.getId(), code);
@@ -344,6 +345,6 @@ public class Main {
             number = scanner.nextInt();
         }
 
-        ofUnits[number] = new OFUnit(number, openMode);
+        ofUnits[number] = new OFUnit(ufdUnit.getId(), openMode);
     }
 }
